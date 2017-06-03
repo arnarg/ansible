@@ -1,0 +1,36 @@
+---
+- name: create plex group
+  group:
+    name: plex
+    gid: 135
+    state: present
+    system: yes
+  become: yes
+
+- name: create plex user
+  user:
+    name: plex
+    uid: 124
+    state: present
+    system: yes
+    group: plex
+    home: /var/lib/plexmediaserver
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: add plex repository
+  yum_repository:
+    name: PlexRepo
+    description: PlexRepo
+    file: plex
+    baseurl: https://downloads.plex.tv/repo/rpm/$basearch/
+    enabled: yes
+    gpgkey: https://downloads.plex.tv/plex-keys/PlexSign.key
+    gpgcheck: yes
+  become: yes
+
+- name: install/update plexmediaserver
+  yum:
+    name: plexmediaserver
+    state: latest
+  become: yes
