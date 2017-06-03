@@ -10,7 +10,8 @@
     name: "{{ create_ansible_user }}"
     comment: "Ansible user"
     uid: 2000
-    groups: "{{ ansible_user }}"
+    group: "{{ create_ansible_user }}"
+    groups: "users"
     shell: /bin/bash
     state: present
 
@@ -35,8 +36,16 @@
     mode: 0600
     state: file
 
-- name: Install sudo
+- name: Install sudo on debian derivative
+  when: ansible_os_family == 'Debian'
   apt:
+    name: sudo
+    update_cache: yes
+    state: present
+
+- name: Install sudo on centos
+  when: ansible_os_family == 'RedHat'
+  yum:
     name: sudo
     update_cache: yes
     state: present
