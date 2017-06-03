@@ -1,2 +1,6 @@
 # Ignore rkt images
 *.aci
+
+# Ignore ansible files
+.hosts
+*.retry
