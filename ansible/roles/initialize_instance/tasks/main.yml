@@ -1,0 +1,47 @@
+---
+- name: Create ansible group
+  group:
+    name: "{{ create_ansible_user }}"
+    gid: 2000
+    state: present
+
+- name: Create ansible user
+  user:
+    name: "{{ create_ansible_user }}"
+    comment: "Ansible user"
+    uid: 2000
+    groups: "{{ ansible_user }}"
+    shell: /bin/bash
+    state: present
+
+- name: Create .ssh directory for ansible user
+  file:
+    path: "/home/{{ create_ansible_user }}/.ssh"
+    owner: "{{ create_ansible_user }}"
+    group: "{{ create_ansible_user }}"
+    mode: 0700
+    state: directory
+
+- name: Move authorized_keys to new user
+  shell: "mv /root/.ssh/authorized_keys /home/{{ create_ansible_user }}/.ssh/authorized_keys"
+  args:
+    removes: /root/.ssh/authorized_keys
+
+- name: Make ansible user owner of authorized_keys
+  file:
+    path: "/home/{{ create_ansible_user }}/.ssh/authorized_keys"
+    owner: "{{ create_ansible_user }}"
+    group: "{{ create_ansible_user }}"
+    mode: 0600
+    state: file
+
+- name: Install sudo
+  apt:
+    name: sudo
+    update_cache: yes
+    state: present
+
+- name: Add ansible user as sudoer
+  copy:
+    dest: "/etc/sudoers.d/{{ create_ansible_user }}"
+    content: "{{ create_ansible_user }} ALL=(ALL) NOPASSWD:ALL"
