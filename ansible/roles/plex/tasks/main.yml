@@ -36,16 +36,16 @@
   become: yes
   register: yum
 
-- name: start and enable plexmediaserver
-  service:
-    name: plexmediaserver
-    state: started
-    enabled: yes
-  become: yes
-
 - name: restart plexmediaserver
   when: yum.changed
   service:
     name: plexmediaserver
     state: restarted
+  become: yes
+
+- name: start and enable plexmediaserver
+  service:
+    name: plexmediaserver
+    state: started
+    enabled: yes
   become: yes
