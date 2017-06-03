@@ -1,0 +1,4 @@
+---
+- hosts: mariadb
+  roles:
+    - { role: ../roles/mariadb }

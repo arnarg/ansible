@@ -1,0 +1,51 @@
+---
+- name: create mysql group
+  group:
+    name: mysql
+    gid: 995
+    state: present
+    system: yes
+  become: yes
+
+- name: create mysql user
+  user:
+    name: mysql
+    uid: 997
+    state: present
+    system: yes
+    group: mysql
+    home: /var/lib/mysql
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: add mariadb repository
+  yum_repository:
+    name: mariadb
+    description: MariaDB
+    file: MariaDB
+    baseurl: http://yum.mariadb.org/10.2/centos/$releasever/$basearch/
+    enabled: yes
+    gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+    gpgcheck: yes
+  become: yes
+
+- name: install/update mariadb
+  yum:
+    name: MariaDB-server,MariaDB-client
+    state: latest
+  become: yes
+  register: yum
+
+- name: restart mariadb
+  when: yum.changed
+  service:
+    name: mariadb
+    state: restarted
+  become: yes
+
+- name: start and enable mariadb
+  service:
+    name: mariadb
+    state: started
+    enabled: yes
+  become: yes
