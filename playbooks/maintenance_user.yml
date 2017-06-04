@@ -38,9 +38,9 @@
 
     - name: "create .ssh directory for {{ maintenance_user }}"
       file:
-        path: "/home/{{ create_ansible_user }}/.ssh"
-        owner: "{{ create_ansible_user }}"
-        group: "{{ create_ansible_user }}"
+        path: "/home/{{ maintenance_user }}/.ssh"
+        owner: "{{ maintenance_user }}"
+        group: "{{ maintenance_user }}"
         mode: 0700
         state: directory
       become: yes
