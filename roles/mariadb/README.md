@@ -1,4 +1,4 @@
-# Plex Media Server
+# MariaDB
 
 This role installs MariaDB on centos
 
