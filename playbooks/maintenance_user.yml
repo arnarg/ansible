@@ -32,7 +32,7 @@
 
     - name: make list of keys
       set_fact:
-        authorized_keys: "{{ authorized_keys + '\n' + item.key }}"
+        authorized_keys: "{{ authorized_keys + item.key + '\n' }}"
       with_items: '{{ keys.json }}'
       #when: "{{ item.title | search(include_keys|join('|')) }}"
 
