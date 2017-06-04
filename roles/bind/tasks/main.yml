@@ -1,0 +1,48 @@
+---
+- name: install bind
+  yum:
+    name: bind
+    state: present
+  become: yes
+
+- name: add config file
+  copy:
+    src: named.conf
+    dest: /etc/named.conf
+  become: yes
+  register: config
+
+- name: copy zone files
+  copy:
+    src: zones
+    dest: /etc/named
+  become: yes
+  register: zones
+
+- name: set default run options
+  copy:
+    dest: /etc/sysconfig/named
+    content: OPTIONS="-4"
+  become: yes
+  register: options
+
+- name: reload named on config change
+  when: config.changed or zones.changed
+  service:
+    name: named
+    state: reloaded
+  become: yes
+
+- name: restart named on options change
+  when: options.changed
+  service:
+    name: named
+    state: restarted
+  become: yes
+
+- name: ensure named is started and enabled
+  service:
+    name: named
+    state: started
+    enabled: yes
+  become: yes

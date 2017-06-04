@@ -1,0 +1,9 @@
+zone "lab.codedbearder.com" {
+  type master;
+  file "/etc/bind/zones/db.lab.codedbearder.com";
+};
+
+zone "192.168.in-addr.arpa" {
+  type master;
+  file "/etc/bind/zones/db.168.192";
+};

@@ -1,0 +1,4 @@
+---
+- hosts: bind
+  roles:
+    - { role: ../roles/bind }
