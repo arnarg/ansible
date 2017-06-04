@@ -58,3 +58,4 @@
       copy:
         dest: "/etc/sudoers.d/{{ maintenance_user }}"
         content: "{{ maintenance_user }} ALL=(ALL) ALL"
+      become: yes
