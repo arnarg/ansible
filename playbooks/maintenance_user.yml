@@ -34,7 +34,7 @@
       set_fact:
         authorized_keys: "{{ authorized_keys + '\n' + item.key }}"
       with_items: '{{ keys.json }}'
-      when: "{{ item.title | search(include_keys|join('|')) }}"
+      #when: "{{ item.title | search(include_keys|join('|')) }}"
 
     - name: "create .ssh directory for {{ maintenance_user }}"
       file:
