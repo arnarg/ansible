@@ -2,5 +2,3 @@
 - hosts: all
   roles:
     - { role: ../roles/initialize_instance }
-  vars:
-    create_ansible_user: arnar

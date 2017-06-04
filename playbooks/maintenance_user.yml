@@ -1,0 +1,60 @@
+---
+- hosts: all
+  tasks:
+    - name: "create {{ maintenance_user }} group"
+      group:
+        name: "{{ maintenance_user }}"
+        gid: 1000
+        state: present
+      become: yes
+
+    - name: "create {{ maintenance_user }} group"
+      user:
+        name: "{{ maintenance_user }}"
+        comment: "Maintenance user"
+        uid: 1000
+        group: "{{ maintenance_user }}"
+        groups: "users"
+        shell: /bin/bash
+        password: "{{ maintenance_user_password }}"
+        state: present
+      become: yes
+
+    - name: get authorized_keys
+      uri:
+        url: https://api.github.com/user/keys
+        headers:
+          Authorization: "token {{ github_token }}"
+      register: keys
+
+    - set_fact:
+        authorized_keys: ''
+
+    - name: make list of keys
+      set_fact:
+        authorized_keys: "{{ authorized_keys + '\n' + item.key }}"
+      with_items: '{{ keys.json }}'
+      when: "{{ item.title | search(include_keys|join('|')) }}"
+
+    - name: "create .ssh directory for {{ maintenance_user }}"
+      file:
+        path: "/home/{{ create_ansible_user }}/.ssh"
+        owner: "{{ create_ansible_user }}"
+        group: "{{ create_ansible_user }}"
+        mode: 0700
+        state: directory
+      become: yes
+
+    - name: write authorized_keys
+      copy:
+        dest: "/home/{{ maintenance_user }}/.ssh/authorized_keys"
+        content: "{{ authorized_keys }}"
+        owner: "{{ maintenance_user }}"
+        group: "{{ maintenance_user }}"
+        mode: 0600
+      become: yes
+
+    - name: "add {{ maintenance_user }} as a sudoer"
+      copy:
+        dest: "/etc/sudoers.d/{{ maintenance_user }}"
+        content: "{{ maintenance_user }} ALL=(ALL) ALL"

@@ -11,8 +11,7 @@
     comment: "Ansible user"
     uid: 2000
     group: "{{ create_ansible_user }}"
-    groups: "users"
-    shell: /bin/bash
+    shell: /usr/sbin/nologin
     state: present
 
 - name: Create .ssh directory for ansible user
