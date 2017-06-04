@@ -1,4 +1,4 @@
 ---
-- hosts: all
+- hosts: "{{ init_host }}"
   roles:
     - { role: ../roles/initialize_instance }
