@@ -1,6 +1,6 @@
 $TTL	604800
 @	IN	SOA	ns1.lab.codedbearder.com. admin.lab.codedbearder.com. (
-          1   ; Serial
+          2   ; Serial
      604800   ; Refresh
       86400   ; Retry
     2419200   ; Expire
@@ -11,7 +11,7 @@ $TTL	604800
     IN      NS      ns1.lab.codedbearder.com.
 
 ; name servers - A records
-ns1.lab.codedbearder.com.           IN  A   192.168.10.21
+ns1.lab.codedbearder.com.           IN  A   192.168.10.20
 
 ; 192.168.10.0/24 - A records
 plex.lab.codedbearder.com.          IN  A   192.168.10.10
