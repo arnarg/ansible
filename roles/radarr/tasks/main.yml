@@ -1,0 +1,125 @@
+---
+- name: create radarr group
+  group:
+    name: radarr
+    gid: 995
+    state: present
+    system: yes
+  become: yes
+
+- name: create radarr user
+  user:
+    name: radarr
+    uid: 995
+    state: present
+    system: yes
+    group: radarr
+    home: /var/lib/radarr
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: add epel-release repository
+  yum:
+    name: epel-release
+    state: present
+  become: yes
+
+- name: add mono repo
+  yum_repository:
+    name: mono
+    description: mono
+    baseurl: http://download.mono-project.com/repo/centos/
+    state: present
+    enabled: yes
+    gpgkey: http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    gpgcheck: yes
+  become: yes
+
+- name: install radarr dependencies
+  yum:
+    name:
+      - wget
+      - mediainfo
+      - libzen
+      - libmediainfo
+      - gettext
+      - mono-core
+      - mono-devel
+      - sqlite.x86_64
+      - tar
+    state: present
+  become: yes
+
+- name: add radarr service file
+  copy:
+    src: radarr.service
+    dest: /etc/systemd/system/radarr.service
+  become: yes
+  register: service
+
+- name: reload systemd daemon
+  when: service.changed
+  command: systemctl daemon-reload
+  become: yes
+
+- name: make sure /opt/radarr_version exists
+  copy:
+    dest: /opt/radarr_version
+    content: ''
+    force: no
+  become: yes
+
+- name: check if version number changed
+  slurp:
+    src: /opt/radarr_version
+  register: current
+
+- name: download latest radarr release
+  when: (current.content | b64decode) != radarr_version
+  unarchive:
+    src: "https://github.com/Radarr/Radarr/releases/download/v{{radarr_version}}/Radarr.develop.{{radarr_version}}.linux.tar.gz"
+    dest: /opt/
+    remote_src: True
+  become: yes
+  register: download
+
+- name: stop radarr
+  when: download.changed
+  service:
+    name: radarr
+    state: stopped
+  become: yes
+
+- name: delete old radarr files
+  when: download.changed
+  file:
+    path: /opt/radarr
+    state: absent
+  become: yes
+
+- name: move new files into location
+  when: download.changed
+  command: mv /opt/Radarr /opt/radarr
+  become: yes
+
+- name: fix ownership of radarr files
+  file:
+    path: /opt/radarr
+    owner: radarr
+    group: radarr
+    state: directory
+    recurse: yes
+  become: yes
+
+- name: start and enable radarr service
+  service:
+    name: radarr
+    state: started
+    enabled: yes
+  become: yes
+
+- name: save current version number
+  copy:
+    dest: /opt/radarr_version
+    content: "{{ radarr_version }}"
+  become: yes
