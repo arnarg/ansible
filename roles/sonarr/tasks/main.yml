@@ -1,0 +1,93 @@
+---
+- name: create sonarr group
+  group:
+    name: sonarr
+    gid: 995
+    state: present
+    system: yes
+  become: yes
+
+- name: create sonarr user
+  user:
+    name: sonarr
+    uid: 995
+    state: present
+    system: yes
+    group: sonarr
+    home: /var/lib/sonarr
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: add epel-release repository
+  yum:
+    name: epel-release
+    state: present
+  become: yes
+
+- name: add mono repo
+  yum_repository:
+    name: mono
+    description: mono
+    baseurl: http://download.mono-project.com/repo/centos/
+    state: present
+    enabled: yes
+    gpgkey: http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+    gpgcheck: yes
+  become: yes
+
+- name: install sonarr dependencies
+  yum:
+    name:
+      - wget
+      - mediainfo
+      - libzen
+      - libmediainfo
+      - gettext
+      - mono-core
+      - mono-devel
+      - sqlite.x86_64
+      - tar
+    state: present
+  become: yes
+
+- name: add sonarr service file
+  copy:
+    src: sonarr.service
+    dest: /etc/systemd/system/sonarr.service
+  become: yes
+  register: service
+
+- name: reload systemd daemon
+  when: service.changed
+  command: systemctl daemon-reload
+  become: yes
+
+- name: download latest sonarr release
+  unarchive:
+    src: http://download.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz
+    dest: /opt/
+    remote_src: True
+  become: yes
+
+- name: stop sonarr
+  service:
+    name: sonarr
+    state: stopped
+  become: yes
+
+- name: delete old sonarr files
+  file:
+    path: /opt/sonarr
+    state: absent
+  become: yes
+
+- name: move new files into location
+  command: mv /opt/NzbDrone /opt/sonarr
+  become: yes
+
+- name: start and enable sonarr service
+  service:
+    name: sonarr
+    state: started
+    enabled: yes
+  become: yes

@@ -1,0 +1,4 @@
+---
+- hosts: sonarr
+  roles:
+    - { role: ../roles/sonarr }
