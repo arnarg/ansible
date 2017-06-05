@@ -62,26 +62,43 @@
   command: systemctl daemon-reload
   become: yes
 
+- name: make sure /opt/sonarr_version exists
+  copy:
+    dest: /opt/sonarr_version
+    content: ''
+    force: no
+  become: yes
+
+- name: check if version number changed
+  slurp:
+    src: /opt/sonarr_version
+  register: current
+
 - name: download latest sonarr release
+  when: (current.content | b64decode) != sonarr_version
   unarchive:
-    src: http://download.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz
+    src: "http://download.sonarr.tv/v2/master/mono/NzbDrone.master.{{ sonarr_version }}.mono.tar.gz"
     dest: /opt/
     remote_src: True
   become: yes
+  register: download
 
 - name: stop sonarr
+  when: download.changed
   service:
     name: sonarr
     state: stopped
   become: yes
 
 - name: delete old sonarr files
+  when: download.changed
   file:
     path: /opt/sonarr
     state: absent
   become: yes
 
 - name: move new files into location
+  when: download.changed
   command: mv /opt/NzbDrone /opt/sonarr
   become: yes
 
@@ -90,4 +107,10 @@
     name: sonarr
     state: started
     enabled: yes
+  become: yes
+
+- name: save current version number
+  copy:
+    dest: /opt/sonarr_version
+    content: "{{ sonarr_version }}"
   become: yes
