@@ -1,0 +1,103 @@
+---
+- name: create prometheus group
+  group:
+    name: prometheus
+    state: present
+    system: yes
+  become: yes
+
+- name: create prometheus user
+  user:
+    name: prometheus
+    state: present
+    system: yes
+    group: prometheus
+    home: /var/lib/prometheus
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: install dependencies
+  yum:
+    name: tar
+    state: present
+  become: yes
+
+- name: make sure /tmp/prometheus_version exists
+  copy:
+    dest: /tmp/prometheus_version
+    content: ''
+    force: no
+
+- name: check if version number changed
+  slurp:
+    src: /tmp/prometheus_version
+  register: current
+
+- name: download requested prometheus release
+  when: (current.content | b64decode) != prometheus_version
+  unarchive:
+    src: "https://github.com/prometheus/prometheus/releases/download/v{{prometheus_version}}/prometheus-{{prometheus_version}}.linux-amd64.tar.gz"
+    dest: /tmp/
+    remote_src: True
+  register: download
+
+- name: install prometheus
+  when: download.changed
+  copy:
+    src: /tmp/prometheus-{{prometheus_version}}.linux-amd64/prometheus
+    dest: /usr/bin/prometheus
+    force: yes
+    remote_src: True
+    mode: 0755
+  become: yes
+
+- name: make sure /etc/prometheus exists
+  file:
+    path: /etc/prometheus
+    state: directory
+  become: yes
+
+- name: copy prometheus config
+  copy:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+  become: yes
+  register: config
+
+- name: copy prometheus service file
+  copy:
+    src: prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+  become: yes
+  register: service
+
+- name: reload systemd daemon
+  when: service.changed
+  command: systemctl daemon-reload
+  become: yes
+
+- name: restart prometheus service
+  when: service.changed
+  service:
+    name: prometheus
+    state: restarted
+  become: yes
+
+- name: reload prometheus service
+  when: config.changed
+  service:
+    name: prometheus
+    state: reloaded
+  become: yes
+
+- name: start and enable prometheus service
+  service:
+    name: prometheus
+    state: started
+    enabled: yes
+  become: yes
+
+- name: save current version number
+  copy:
+    dest: /tmp/prometheus_version
+    content: "{{ prometheus_version }}"
