@@ -1,0 +1,77 @@
+---
+- name: create exporter group
+  group:
+    name: exporter
+    state: present
+    system: yes
+  become: yes
+
+- name: create exporter user
+  user:
+    name: exporter
+    state: present
+    system: yes
+    group: exporter
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: install dependencies
+  yum:
+    name:
+      - git
+      - golang
+      - make
+    state: present
+  become: yes
+
+- name: pull influxdb_exporter HEAD from github
+  git:
+    repo: "https://github.com/prometheus/influxdb_exporter.git"
+    dest: /tmp/go/src/github.com/prometheus/influxdb_exporter
+    version: HEAD
+  register: repo
+
+- name: build influxdb_exporter
+  when: repo.changed
+  make:
+    chdir: /tmp/go/src/github.com/prometheus/influxdb_exporter
+    target: build
+  environment:
+    GOPATH: /tmp/go
+
+- name: install influxdb_exporter
+  when: repo.changed
+  copy:
+    src: /tmp/go/src/github.com/prometheus/influxdb_exporter/influxdb_exporter
+    dest: /usr/bin/influxdb_exporter
+    force: yes
+    remote_src: True
+    mode: 0755
+  become: yes
+  register: binary
+
+- name: add influxdb_exporter service file
+  copy:
+    src: influxdb_exporter.service
+    dest: /etc/systemd/system/influxdb_exporter.service
+  become: yes
+  register: service
+
+- name: reload systemd daemon
+  when: service.changed
+  command: systemctl daemon-reload
+  become: yes
+
+- name: restart influxdb_exporter service
+  when: binary.changed or service.changed
+  service:
+    name: influxdb_exporter
+    state: restarted
+  become: yes
+
+- name: start and enable influxdb_exporter service
+  service:
+    name: influxdb_exporter
+    state: started
+    enabled: yes
+  become: yes

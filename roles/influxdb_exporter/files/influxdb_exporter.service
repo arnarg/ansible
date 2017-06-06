@@ -1,0 +1,13 @@
+[Unit]
+Description=InfluxDb exporter for Prometheus
+After=syslog.target network.target
+
+[Service]
+User=exporter
+Group=exporter
+Type=simple
+ExecStart=/usr/bin/influxdb_exporter
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

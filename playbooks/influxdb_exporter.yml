@@ -1,0 +1,4 @@
+---
+- hosts: prometheus
+  roles:
+    - { role: ../roles/influxdb_exporter }
