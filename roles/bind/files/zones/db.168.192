@@ -13,6 +13,7 @@ $TTL	604800
 ; 192.168.10.0/24 - PTR records
 20.10   IN  PTR   ns1.lab.codedbearder.com.           ; 192.168.10.20
 10.10   IN  PTR   plex.lab.codedbearder.com.          ; 192.168.10.10
+3.10    IN  PTR   prometheus.lab.codedbearder.com.    ; 192.168.10.3
 4.10    IN  PTR   semaphore.lab.codedbearder.com.     ; 192.168.10.4
 5.10    IN  PTR   boinc.lab.codedbearder.com.         ; 192.168.10.5
 7.10    IN  PTR   mariadb.lab.codedbearder.com.       ; 192.168.10.7

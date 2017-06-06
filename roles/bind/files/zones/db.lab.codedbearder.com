@@ -15,6 +15,7 @@ ns1.lab.codedbearder.com.           IN  A   192.168.10.20
 
 ; 192.168.10.0/24 - A records
 plex.lab.codedbearder.com.          IN  A   192.168.10.10
+prometheus.lab.codedbearder.com.    IN  A   192.168.10.3
 semaphore.lab.codedbearder.com.     IN  A   192.168.10.4
 boinc.lab.codedbearder.com.         IN  A   192.168.10.5
 mariadb.lab.codedbearder.com.       IN  A   192.168.10.7
