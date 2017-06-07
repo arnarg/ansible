@@ -1,0 +1,35 @@
+---
+- name: add grafana repository
+  yum_repository:
+    name: grafana
+    description: grafana
+    file: grafana
+    baseurl: "https://packagecloud.io/grafana/stable/el/$releasever/$basearch"
+    enabled: yes
+    gpgkey: "https://packagecloud.io/gpg.key https://grafanarel.s3.amazonaws.com/RPM-GPG-KEY-grafana"
+    gpgcheck: yes
+    repo_gpgcheck: yes
+    sslverify: yes
+    sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+  become: yes
+
+- name: install/update grafana
+  yum:
+    name: grafana
+    state: latest
+  become: yes
+  register: yum
+
+- name: restart grafana
+  when: yum.changed
+  service:
+    name: grafana-server
+    state: restarted
+  become: yes
+
+- name: start and enable grafana
+  service:
+    name: grafana-server
+    state: started
+    enabled: yes
+  become: yes
