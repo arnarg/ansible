@@ -1,6 +1,6 @@
 $TTL	604800
 @	IN	SOA	ns1.lab.codedbearder.com. admin.lab.codedbearder.com. (
-          1   ; Serial
+          2   ; Serial
      604800   ; Refresh
       86400   ; Retry
     2419200   ; Expire
@@ -17,6 +17,7 @@ $TTL	604800
 4.10    IN  PTR   semaphore.lab.codedbearder.com.     ; 192.168.10.4
 5.10    IN  PTR   boinc.lab.codedbearder.com.         ; 192.168.10.5
 7.10    IN  PTR   mariadb.lab.codedbearder.com.       ; 192.168.10.7
+8.10    IN  PTR   grafana.lab.codedbearder.com.       ; 192.168.10.8
 
 ; 192.168.100.0/24 - PTR records
 2.100   IN  PTR   transmission.lab.codedbearder.com.  ; 192.168.100.2
