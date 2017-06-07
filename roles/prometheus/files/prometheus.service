@@ -8,7 +8,8 @@ Group=prometheus
 Type=simple
 ExecStart=/usr/bin/prometheus \
             -config.file=/etc/prometheus/prometheus.yml \
-            -storage.local.path=/var/lib/prometheus
+            -storage.local.path=/var/lib/prometheus \
+            -storage.local.retention=120h0m0s
 ExecReload=/bin/kill -HUP $MAINPID
 TimeoutStopSec=20
 
