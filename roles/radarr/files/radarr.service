@@ -3,6 +3,7 @@ Description=Radarr Daemon
 After=syslog.target network.target
 
 [Service]
+Environment=MONO_TLS_PROVIDER=legacy
 User=radarr
 Group=radarr
 Type=simple
