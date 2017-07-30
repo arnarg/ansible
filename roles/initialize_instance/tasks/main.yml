@@ -53,3 +53,6 @@
   copy:
     dest: "/etc/sudoers.d/{{ create_ansible_user }}"
     content: "{{ create_ansible_user }} ALL=(ALL) NOPASSWD:ALL"
+
+- include: freeipa.yml
+  when: freeipa_enroll

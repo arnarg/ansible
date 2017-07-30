@@ -1,2 +1,3 @@
 ---
 create_ansible_user: ansible
+freeipa_enroll: true
