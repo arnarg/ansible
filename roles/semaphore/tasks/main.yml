@@ -16,7 +16,7 @@
     state: present
     system: yes
     group: semaphore
-    home: /var/lib/semaphore
+    home: /home/semaphore
     shell: /bin/bash
   become: yes
 
@@ -54,6 +54,8 @@
   template:
     src: config.json.j2
     dest: /var/lib/semaphore/config.json
+    owner: semaphore
+    group: semaphore
   become: yes
   register: config
 
