@@ -1,3 +1,4 @@
 # Ignore ansible files
 .hosts
+.vars
 *.retry

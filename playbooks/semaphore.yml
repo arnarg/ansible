@@ -1,0 +1,4 @@
+---
+- hosts: semaphore
+  roles:
+    - { role: ../roles/semaphore }

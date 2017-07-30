@@ -1,0 +1,31 @@
+{
+ 	"mysql": {
+ 		"host": "{{mysql_host}}:{{mysql_port}}",
+ 		"user": "{{mysql_user}}",
+ 		"pass": "{{mysql_passwd}}",
+ 		"name": "{{mysql_database}}"
+ 	},
+ 	"port": "",
+ 	"bugsnag_key": "",
+ 	"tmp_path": "/tmp/semaphore",
+ 	"cookie_hash": "{{cookie_hash}}",
+ 	"cookie_encryption": "{{cookie_encryption}}",
+ 	"email_alert": false,
+ 	"web_host": "http://{{web_host}}:3000/",
+ 	"ldap_enable": {{ 'true' if ldap_enable else 'false' }},
+  {% if ldap_enable %}
+ 	"ldap_binddn": "uid=semaphore,cn=sysaccounts,cn=etc,dc=lab,dc=codedbearder,dc=com",
+ 	"ldap_bindpassword": "{{ldap_passwd}}",
+ 	"ldap_server": "{{ldap_server}}:{{ldap_port}}",
+ 	"ldap_needtls": false,
+ 	"ldap_searchdn": "cn=users,cn=accounts,dc=lab,dc=codedbearder,dc=com",
+ 	"ldap_searchfilter": "(&(uid=%s)(memberOf=cn=semaphore_users,cn=groups,cn=accounts,dc=lab,dc=codedbearder,dc=com))",
+ 	"ldap_mappings": {
+ 		"dn": "dn",
+ 		"mail": "mail",
+ 		"uid": "uid",
+ 		"cn": "cn"
+ 	},
+  {% endif %}
+ 	"telegram_alert": false
+}

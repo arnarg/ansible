@@ -1,0 +1,65 @@
+---
+- name: create semaphore group
+  tags: setup
+  group:
+    name: semaphore
+    gid: 995
+    state: present
+    system: yes
+  become: yes
+
+- name: create semaphore user
+  tags: setup
+  user:
+    name: semaphore
+    uid: 997
+    state: present
+    system: yes
+    group: semaphore
+    home: /var/lib/semaphore
+    shell: /bin/bash
+  become: yes
+
+- name: copy semaphore.service
+  tags: setup
+  copy:
+    src: semaphore.service
+    dest: /etc/systemd/system/semaphore.service
+  register: service_file
+  become: yes
+
+- name: reload systemd
+  tags: setup
+  when: service_file.changed
+  raw: systemctl daemon-reload
+  become: yes
+
+- name: stop semaphore service
+  service:
+    name: semaphore
+    state: stopped
+  become: yes
+
+- name: download semaphore binary
+  tags: setup
+  get_url:
+    url: "https://github.com/ansible-semaphore/semaphore/releases/download/v{{semaphore_version}}/semaphore_linux_amd64"
+    dest: /usr/bin/semaphore
+    force: yes
+    mode: 0755
+  become: yes
+
+- name: copy semaphore config
+  tags: setup
+  template:
+    src: config.json.j2
+    dest: /var/lib/semaphore/config.json
+  become: yes
+  register: config
+
+- name: start and enable semaphore
+  service:
+    name: semaphore
+    state: started
+    enabled: yes
+  become: yes

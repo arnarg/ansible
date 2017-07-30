@@ -1,0 +1,13 @@
+[Unit]
+Description=Ansible semaphore
+
+[Service]
+Type=simple
+User=semaphore
+Group=semaphore
+ExecStart=/usr/bin/semaphore -config /var/lib/semaphore/config.json
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
