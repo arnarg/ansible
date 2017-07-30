@@ -20,6 +20,30 @@
     shell: /bin/bash
   become: yes
 
+- name: add epel-release repository
+  yum:
+    name: epel-release
+    state: present
+  become: yes
+
+- name: install dependencies
+  yum:
+    name:
+      - git
+      - ansible
+    state: latest
+  become: yes
+
+- name: ignore StrictHostKeyChecking in ssh
+  copy:
+    dest: /home/semaphore/.ssh/config
+    content: |
+      StrictHostKeyChecking no
+    owner: semaphore
+    group: semaphore
+    mode: 0600
+  become: yes
+
 - name: copy semaphore.service
   tags: setup
   copy:
