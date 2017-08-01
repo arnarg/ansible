@@ -45,6 +45,7 @@
       - gettext
       - mono-core
       - mono-devel
+      - mono-locale-extras
       - sqlite.x86_64
       - tar
     state: present
