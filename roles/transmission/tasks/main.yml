@@ -1,0 +1,54 @@
+---
+- name: create transmission group
+  group:
+    name: transmission
+    gid: 995
+    state: present
+    system: yes
+  become: yes
+
+- name: create transmission user
+  user:
+    name: transmission
+    uid: 997
+    state: present
+    system: yes
+    group: transmission
+    home: /var/lib/transmission
+    shell: /usr/sbin/nologin
+  become: yes
+
+- name: add epel-release
+  yum:
+    name: epel-release
+    state: present
+  become: yes
+
+- name: install transmission
+  yum:
+    name: transmission-daemon
+    state: latest
+  become: yes
+
+- name: copy transmission config
+  template:
+    src: config.json.j2
+    dest: /var/lib/transmission/.config/transmission-daemon/settings.json
+    mode: 0600
+    owner: transmission
+    group: transmission
+  become: yes
+  register: config_file
+
+- name: reload transmission
+  when: config_file.changed
+  service:
+    name: transmission-daemon
+    state: reloaded
+  become: yes
+
+- name: start and enable transmission
+  service:
+    name: transmission-daemon
+    state: started
+  become: yes

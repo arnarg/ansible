@@ -1,0 +1,4 @@
+---
+- hosts: transmission
+  roles:
+    - { role: ../roles/transmission }
