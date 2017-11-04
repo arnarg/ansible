@@ -63,6 +63,21 @@
   command: systemctl daemon-reload
   become: yes
 
+- name: fetch radarr versions from github
+  uri:
+    url: https://api.github.com/repos/Radarr/Radarr/releases
+  register: versions
+
+- name: extract version latest version tag
+  set_fact:
+    radarr_version: "{{versions.json[0].tag_name}}"
+
+- name: find latest linux version url
+  when: item.name | regex_search('linux\\.tar\\.gz$')
+  set_fact:
+    radarr_download_link: "{{item.browser_download_url}}"
+  with_items: "{{versions.json[0].assets}}"
+
 - name: make sure /opt/radarr_version exists
   copy:
     dest: /opt/radarr_version
@@ -78,7 +93,7 @@
 - name: download latest radarr release
   when: (current.content | b64decode) != radarr_version
   unarchive:
-    src: "https://github.com/Radarr/Radarr/releases/download/v{{radarr_version}}/Radarr.develop.{{radarr_version}}.linux.tar.gz"
+    src: "{{radarr_download_link}}"
     dest: /opt/
     remote_src: True
   become: yes
