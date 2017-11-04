@@ -62,6 +62,15 @@
   command: systemctl daemon-reload
   become: yes
 
+- name: fetch radarr versions from github
+  uri:
+    url: https://api.github.com/repos/Sonarr/Sonarr/tags
+  register: versions
+
+- name: extract latest sonarr version
+  set_fact:
+    sonarr_version: "{{versions.json[0].name | regex_replace('^v')}}"
+
 - name: make sure /opt/sonarr_version exists
   copy:
     dest: /opt/sonarr_version
