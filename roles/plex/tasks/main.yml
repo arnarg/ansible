@@ -2,7 +2,7 @@
 - name: create plex group
   group:
     name: plex
-    gid: 135
+    gid: "{{plex_user_gid}}"
     state: present
     system: yes
   become: yes
@@ -10,7 +10,7 @@
 - name: create plex user
   user:
     name: plex
-    uid: 124
+    uid: "{{plex_user_uid}}"
     state: present
     system: yes
     group: plex
