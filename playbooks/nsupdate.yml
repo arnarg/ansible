@@ -1,0 +1,22 @@
+- host: dns
+  tasks:
+    - name: "Add or modify {{item.domain}} A to {{item.ip}}"
+      nsupdate:
+        key_name: "{{nsupdate_key_name}}"
+        key_secret: "{{nsupdate_key_secret}}"
+        server: "{{nsupdate_dns_server}}"
+        zone: "{{nsupdate_forward_zone}}"
+        record: "{{item.domain}}"
+        value: "{{item.ip}}"
+        type: "A"
+      loop: "{{nsupdate_domain_list}}"
+    - name: "Add or modify {{item.domain}} PTR to {{item.ip}}"
+      nsupdate:
+        key_name: "{{nsupdate_key_name}}"
+        key_secret: "{{nsupdate_key_secret}}"
+        server: "{{nsupdate_dns_server}}"
+        zone: "{{nsupdate_reverse_zone}}"
+        record: "{{item.domain}}"
+        value: "{{item.ip | regex_replace('^\\d{1,3}\\.\\d{1,3}\\.(\\d{1,3})\\.(\\d{1,3})$', '\\2.\\1')}}"
+        type: "PTR"
+      loop: "{{nsupdate_domain_list}}"
