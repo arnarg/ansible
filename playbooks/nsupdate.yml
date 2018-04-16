@@ -1,4 +1,4 @@
-- host: dns
+- hosts: dns
   tasks:
     - name: "Add or modify {{item.domain}} A to {{item.ip}}"
       nsupdate:
